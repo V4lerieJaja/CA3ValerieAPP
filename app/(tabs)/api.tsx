@@ -1,81 +1,60 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 
-const API_URL = 'https://jsonplaceholder.typicode.com/users';
-
-const ApiScreen = () => {
-  const [data, setData] = useState<any[]>([]);
+export default function CompanyEmailScreen() {
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(false);
+  const [fetched, setFetched] = useState(false);
 
   useEffect(() => {
-    fetch(API_URL)
-      .then((response) => response.json())
-      .then((json) => {
-        setData(json);
-        setLoading(false);
+    fetch('https://fake-json-api.mock.beeceptor.com/users')
+      .then((res) => res.json())
+      .then(() => {
+        setFetched(true);       // Mark as fetched
+        setLoading(false);      // Stop loading
       })
       .catch((err) => {
-        setError('Failed to load data');
+        console.error('API Error:', err);
+        setError(true);         // Show error if fetch fails
         setLoading(false);
       });
   }, []);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>API Screen - User List</Text>
-      {loading && <ActivityIndicator size="large" color="#000" />}
-      {error ? (
-        <Text style={styles.error}>{error}</Text>
+      <Text style={styles.title}>Data Fetch Status</Text>
+
+      {loading ? (
+        <ActivityIndicator size="large" color="#007AFF" />
+      ) : error ? (
+        <Text style={styles.errorText}>❌ Failed to fetch data</Text>
       ) : (
-        <FlatList
-          data={data}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <View style={styles.card}>
-              <Text style={styles.name}>{item.name}</Text>
-              <Text style={styles.email}>{item.email}</Text>
-              <Text>{item.company.name}</Text>
-            </View>
-          )}
-        />
+        <Text style={styles.successText}>✅ Data has been successfully fetched!</Text>
       )}
     </View>
   );
-};
-
-export default ApiScreen;
+}
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#ffc0cb', // pink background
     padding: 20,
+    paddingTop: 50,
+    backgroundColor: 'pink',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  heading: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
+  title: {
+    fontSize: 22,
+    fontWeight: '600',
+    marginBottom: 30,
   },
-  card: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
+  successText: {
+    fontSize: 18,
+    color: 'green',
   },
-  name: {
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  email: {
-    fontStyle: 'italic',
-    color: '#555',
-  },
-  error: {
+  errorText: {
+    fontSize: 18,
     color: 'red',
-    fontSize: 16,
-    textAlign: 'center',
-    marginTop: 20,
   },
 });
