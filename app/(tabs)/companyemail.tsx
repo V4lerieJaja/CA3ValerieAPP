@@ -1,44 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
-
-type User = {
-  email: string;
-  company: string;
-};
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 
 export default function CompanyEmailScreen() {
-  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [fetched, setFetched] = useState(false);
 
   useEffect(() => {
     fetch('https://fake-json-api.mock.beeceptor.com/users')
       .then((res) => res.json())
-      .then((data: User[]) => {
-        setUsers(data);
-        setLoading(false);
+      .then(() => {
+        setFetched(true);       // Mark as fetched
+        setLoading(false);      // Stop loading
       })
       .catch((err) => {
         console.error('API Error:', err);
+        setError(true);         // Show error if fetch fails
         setLoading(false);
       });
   }, []);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Company and Email List</Text>
+      <Text style={styles.title}>Data Fetch Status</Text>
+
       {loading ? (
         <ActivityIndicator size="large" color="#007AFF" />
+      ) : error ? (
+        <Text style={styles.errorText}>❌ Failed to fetch data</Text>
       ) : (
-        <FlatList
-          data={users}
-          keyExtractor={(_, index) => index.toString()}
-          renderItem={({ item }) => (
-            <View style={styles.item}>
-              <Text style={styles.text}>{item.email}</Text>
-              <Text style={styles.text}>{item.company}</Text>
-            </View>
-          )}
-        />
+        <Text style={styles.successText}>✅ Data has been successfully fetched!</Text>
       )}
     </View>
   );
@@ -50,20 +41,20 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     backgroundColor: 'pink',
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '600',
-    marginBottom: 20,
-    textAlign: 'center',
+    marginBottom: 30,
   },
-  item: {
-    backgroundColor: '#eee',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
+  successText: {
+    fontSize: 18,
+    color: 'green',
   },
-  text: {
-    fontSize: 16,
+  errorText: {
+    fontSize: 18,
+    color: 'red',
   },
 });
