@@ -10,7 +10,7 @@ export default function TabLayout() {
   return (
     <Tabs screenOptions={{ tabBarActiveTintColor: 'hotpink' }}>
       <Tabs.Screen
-        name="welcome"
+        name="index"
         options={{
           title: 'Welcome',
           tabBarIcon: ({ color }) => <TabBarIcon name="smile-o" color={color} />,
